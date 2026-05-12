@@ -58,7 +58,7 @@ setOption3("");
     <div>
       <h2>Gaming Polls</h2>
 
-      <div>
+      <div className="poll-form">
       <input
   type="text"
   placeholder="Enter poll question"
@@ -94,11 +94,19 @@ setOption3("");
         <div className="poll-card" key={poll.id}>
           <h3>{poll.question}</h3>
 
-          {poll.options.map((option) => (
-           <button className="choice-button" key={option.id} onClick={() => vote(poll.id, option.id)}>
-              {option.text} - Votes: {option.voteCount}
-            </button>
-          ))}
+          {poll.options && poll.options.length > 0 ? (
+  poll.options.map((option) => (
+    <button
+      className="choice-button"
+      key={option.id}
+      onClick={() => vote(poll.id, option.id)}
+    >
+      {option.text} - Votes: {option.voteCount}
+    </button>
+  ))
+) : (
+  <p>No options available yet.</p>
+)}
         </div>
       ))}
     </div>

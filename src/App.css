@@ -67,3 +67,20 @@ button {
   font-weight: bold;
   cursor: pointer;
 }
+.poll-form {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr 1fr auto;
+  gap: 14px;
+  align-items: center;
+  margin-bottom: 35px;
+}
+
+.poll-form input {
+  width: auto;
+  margin: 0;
+}
+
+.poll-form button {
+  height: 58px;
+  margin: 0;
+}
