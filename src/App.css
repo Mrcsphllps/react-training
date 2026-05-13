@@ -30,16 +30,22 @@ h2 {
 }
 
 .choice-button {
-  min-width: 260px;
-  margin: 12px 18px 12px 0;
-  padding: 18px 25px;
-  border: none;
-  border-radius: 7px;
-  cursor: pointer;
-  background: #16bdf2;
+  background: #29b6f6;
   color: white;
-  font-size: 18px;
+  border: none;
+  padding: 14px 22px;
+  border-radius: 10px;
+  cursor: pointer;
   font-weight: bold;
+  transition: all 0.25s ease;
+  margin-right: 12px;
+  margin-bottom: 12px;
+}
+
+.choice-button:hover {
+  transform: translateY(-3px);
+  background: #4fc3f7;
+  box-shadow: 0 8px 18px rgba(41, 182, 246, 0.35);
 }
 
 input {
@@ -83,4 +89,53 @@ button {
 .poll-form button {
   height: 58px;
   margin: 0;
+  transition: all 0.25s ease;
+}
+
+.poll-form button:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 18px rgba(41, 182, 246, 0.35);
+}
+
+.poll-card {
+  background-color: rgba(255, 255, 255, 0.06);
+  padding: 25px;
+  border-radius: 14px;
+  margin-bottom: 30px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+}
+
+.poll-card h3 {
+  margin-top: 0;
+  margin-bottom: 20px;
+}
+
+.delete-button {
+  margin-right: 16px;
+  background: #ff5252;
+  color: white;
+  border: none;
+  padding: 10px 16px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: bold;
+  margin-bottom: 18px;
+  transition: all 0.25s ease;
+  margin-left: 15px;
+}
+
+.delete-button:hover {
+  background: #ff6b6b;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 14px rgba(255, 82, 82, 0.35);
+}
+
+.empty-message {
+  background-color: rgba(255, 255, 255, 0.05);
+  padding: 30px;
+  border-radius: 12px;
+  text-align: center;
+  color: #d0d0d0;
+  font-size: 18px;
+  margin-top: 25px;
 }

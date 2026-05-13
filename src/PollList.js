@@ -1,18 +1,25 @@
 import { useEffect, useState } from "react";
 
 function PollList() {
+  
   const [question, setQuestion] = useState("");
   const [option1, setOption1] = useState("");
 const [option2, setOption2] = useState("");
 const [option3, setOption3] = useState("");
   const [polls, setPolls] = useState([]);
+const [editingPollId, setEditingPollId] = useState(null);
+const [editQuestion, setEditQuestion] = useState("");
 
-  useEffect(() => {
-    fetch("http://localhost:5000/api/polls")
-      .then((response) => response.json())
-      .then((data) => setPolls(data))
-      .catch((error) => console.error("Error fetching polls:", error));
-  }, []);
+  const fetchPolls = () => {
+  fetch("http://localhost:5000/api/polls")
+    .then((response) => response.json())
+    .then((data) => setPolls(data))
+    .catch((error) => console.error("Error fetching polls:", error));
+};
+
+useEffect(() => {
+  fetchPolls();
+}, []);
        function vote(pollId, choiceId) {
   fetch(`http://localhost:5000/api/polls/${pollId}/vote/${choiceId}`, {
     method: "POST",
@@ -54,6 +61,46 @@ setOption3("");
     })
     .catch((error) => console.error("Error creating poll:", error));
 }
+
+function deletePoll(pollId) {
+  const confirmed = window.confirm(
+    "Are you sure you want to delete this poll?"
+  );
+
+  if (!confirmed) {
+    return;
+  }
+
+  fetch(`http://localhost:5000/api/polls/${pollId}`, {
+    method: "DELETE",
+  })
+    .then(() => {
+      setPolls(polls.filter((poll) => poll.id !== pollId));
+    })
+    .catch((error) => console.error("Error deleting poll:", error));
+}
+const updatePoll = async (pollId) => {
+  try {
+
+    await fetch(`http://localhost:5000/api/polls/${pollId}`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        question: editQuestion,
+        options: polls.find(p => p.id === pollId).options
+      }),
+    });
+
+    fetchPolls();
+
+    setEditingPollId(null);
+
+  } catch (error) {
+    console.error("Error updating poll:", error);
+  }
+};
   return (
     <div>
       <h2>Gaming Polls</h2>
@@ -90,9 +137,50 @@ setOption3("");
   <button onClick={createPoll}>Create Poll</button>
 </div>
 
-      {polls.map((poll) => (
+      {polls.length === 0 ? (
+  <p className="empty-message">
+  No polls available yet. Create your first poll above.
+</p>
+) : (
+  polls.map((poll) => (
         <div className="poll-card" key={poll.id}>
-          <h3>{poll.question}</h3>
+          {editingPollId === poll.id ? (
+            <>
+              <input
+                type="text"
+                value={editQuestion}
+                onChange={(e) => setEditQuestion(e.target.value)}
+              />
+
+              <button
+                className="edit-button"
+                onClick={() => updatePoll(poll.id)}
+              >
+                Save
+              </button>
+            </>
+          ) : (
+            <h3>{poll.question}</h3>
+          )}
+
+          {editingPollId !== poll.id && (
+  <button
+    className="edit-button"
+    onClick={() => {
+      setEditingPollId(poll.id);
+      setEditQuestion(poll.question);
+    }}
+  >
+    Edit Poll
+  </button>
+)}
+
+<button
+  className="delete-button"
+  onClick={() => deletePoll(poll.id)}
+>
+  Delete Poll
+</button>
 
           {poll.options && poll.options.length > 0 ? (
   poll.options.map((option) => (
@@ -103,14 +191,15 @@ setOption3("");
     >
       {option.text} - Votes: {option.voteCount}
     </button>
-  ))
-) : (
-  <p>No options available yet.</p>
-)}
-        </div>
-      ))}
-    </div>
-  );
+             ))
+        ) : (
+          <p>No options available yet.</p>
+        )}
+      </div>
+    ))
+  )}
+</div>
+);
 }
 
 export default PollList;
