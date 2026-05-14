@@ -139,3 +139,7 @@ button {
   font-size: 18px;
   margin-top: 25px;
 }
+
+.auth-toggle-button {
+  margin-top: 20px;
+}
