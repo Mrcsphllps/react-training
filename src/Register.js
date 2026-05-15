@@ -1,19 +1,39 @@
 import { useState } from "react";
 
-function Register() {
+function Register({ setShowRegister }) {
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
-  const handleRegister = async (e) => {
-    e.preventDefault();
+    const handleRegister = async (e) => {
+      e.preventDefault();
 
-    console.log("Register clicked", {
-      username,
-      email,
-      password,
-    });
-  };
+      try {
+        const response = await fetch("http://localhost:5000/api/auth/signup", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            username,
+            email,
+            password,
+          }),
+        });
+
+        const data = await response.text();
+
+        console.log("Register response:", data);
+
+        alert("Registration successful!");
+        setShowRegister(false);
+
+      } catch (error) {
+        console.error("Register error:", error);
+
+        alert("Registration failed!");
+      }
+    };
 
   return (
     <div className="login-container">

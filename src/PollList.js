@@ -11,7 +11,11 @@ const [editingPollId, setEditingPollId] = useState(null);
 const [editQuestion, setEditQuestion] = useState("");
 
   const fetchPolls = () => {
-  fetch("http://localhost:5000/api/polls")
+  fetch("http://localhost:5000/api/polls", {
+  headers: {
+    Authorization: `Bearer ${localStorage.getItem("token")}`,
+  },
+})
     .then((response) => response.json())
     .then((data) => setPolls(data))
     .catch((error) => console.error("Error fetching polls:", error));
@@ -20,28 +24,26 @@ const [editQuestion, setEditQuestion] = useState("");
 useEffect(() => {
   fetchPolls();
 }, []);
-       function vote(pollId, choiceId) {
-  fetch(`http://localhost:5000/api/polls/${pollId}/vote/${choiceId}`, {
-    method: "POST",
-  })
-    .then((response) => response.json())
-    .then(() => {
-      fetch("http://localhost:5000/api/polls")
-        .then((response) => response.json())
-        .then((data) => setPolls(data));
+
+  function vote(pollId, choiceId) {
+    fetch(`http://localhost:5000/api/polls/${pollId}/vote/${choiceId}`, {
+      method: "POST",
     })
-    .catch((error) => console.error("Error voting:", error));
-}
+      .then(() => fetchPolls())
+      .catch((error) => console.error("Error voting:", error));
+  }
+
   function createPoll() {
     if (!question || !option1 || !option2 || !option3) {
   alert("Please fill in the question and all three options.");
   return;
 }
   fetch("http://localhost:5000/api/polls", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
+  method: "POST",
+  headers: {
+    "Content-Type": "application/json",
+    Authorization: `Bearer ${localStorage.getItem("token")}`,
+  },
     body: JSON.stringify({
       question: question,
       options: [
@@ -72,8 +74,11 @@ function deletePoll(pollId) {
   }
 
   fetch(`http://localhost:5000/api/polls/${pollId}`, {
-    method: "DELETE",
-  })
+  method: "DELETE",
+  headers: {
+    Authorization: `Bearer ${localStorage.getItem("token")}`,
+  },
+})
     .then(() => {
       setPolls(polls.filter((poll) => poll.id !== pollId));
     })

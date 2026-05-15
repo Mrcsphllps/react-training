@@ -30,7 +30,7 @@ function App() {
         </>
       ) : showRegister ? (
         <>
-          <Register />
+          <Register setShowRegister={setShowRegister} />
 
           <button
   className="auth-toggle-button"
