@@ -9,6 +9,7 @@ const [option3, setOption3] = useState("");
   const [polls, setPolls] = useState([]);
 const [editingPollId, setEditingPollId] = useState(null);
 const [editQuestion, setEditQuestion] = useState("");
+const [editOptions, setEditOptions] = useState([]);
 
   const fetchPolls = () => {
   fetch("http://localhost:5000/api/polls", {
@@ -84,17 +85,25 @@ function deletePoll(pollId) {
     })
     .catch((error) => console.error("Error deleting poll:", error));
 }
+
+const cancelEdit = () => {
+  setEditingPollId(null);
+  setEditQuestion("");
+  setEditOptions([]);
+};
+
 const updatePoll = async (pollId) => {
   try {
 
     await fetch(`http://localhost:5000/api/polls/${pollId}`, {
       method: "PUT",
       headers: {
-        "Content-Type": "application/json",
-      },
+  "Content-Type": "application/json",
+  Authorization: `Bearer ${localStorage.getItem("token")}`,
+},
       body: JSON.stringify({
         question: editQuestion,
-        options: polls.find(p => p.id === pollId).options
+        options: editOptions
       }),
     });
 
@@ -151,18 +160,14 @@ const updatePoll = async (pollId) => {
         <div className="poll-card" key={poll.id}>
           {editingPollId === poll.id ? (
             <>
+            <h3>Editing Poll</h3>
               <input
                 type="text"
                 value={editQuestion}
                 onChange={(e) => setEditQuestion(e.target.value)}
               />
 
-              <button
-                className="edit-button"
-                onClick={() => updatePoll(poll.id)}
-              >
-                Save
-              </button>
+
             </>
           ) : (
             <h3>{poll.question}</h3>
@@ -174,20 +179,54 @@ const updatePoll = async (pollId) => {
     onClick={() => {
       setEditingPollId(poll.id);
       setEditQuestion(poll.question);
+      setEditOptions(poll.options.map((option) => ({ ...option })));
     }}
   >
     Edit Poll
   </button>
 )}
 
+{editingPollId !== poll.id && (
 <button
   className="delete-button"
   onClick={() => deletePoll(poll.id)}
 >
   Delete Poll
 </button>
+)}
 
-          {poll.options && poll.options.length > 0 ? (
+  {editingPollId === poll.id ? (
+  <>
+  {editOptions.map((option, index) => (
+    <input
+      className="edit-option-input"
+      key={option.id}
+      type="text"
+      value={option.text}
+      onChange={(e) => {
+        const updatedOptions = [...editOptions];
+        updatedOptions[index].text = e.target.value;
+        setEditOptions(updatedOptions);
+      }}
+    />
+  ))}
+  <div className="edit-actions">
+  <button
+    className="edit-button"
+    onClick={() => updatePoll(poll.id)}
+  >
+    Save
+  </button>
+
+  <button
+    className="delete-button"
+    onClick={cancelEdit}
+  >
+    Cancel
+  </button>
+</div>
+  </>
+) : poll.options && poll.options.length > 0 ? (
   poll.options.map((option) => (
     <button
       className="choice-button"
@@ -196,13 +235,13 @@ const updatePoll = async (pollId) => {
     >
       {option.text} - Votes: {option.voteCount}
     </button>
-             ))
-        ) : (
-          <p>No options available yet.</p>
-        )}
-      </div>
-    ))
-  )}
+  ))
+) : (
+        <p>No options available yet.</p>
+    )}
+  </div>
+))
+)}
 </div>
 );
 }

@@ -143,3 +143,32 @@ button {
 .auth-toggle-button {
   margin-top: 20px;
 }
+
+.edit-option-input {
+  display: block;
+  width: 100%;
+  margin-top: 10px;
+  margin-bottom: 10px;
+  padding: 12px;
+  border-radius: 6px;
+  border: 1px solid #444;
+  background-color: #111827;
+  color: white;
+  box-sizing: border-box;
+}
+
+.edit-option-input {
+  display: block;
+  margin-top: 10px;
+  margin-bottom: 10px;
+  padding: 8px;
+  border-radius: 6px;
+}
+
+.edit-actions {
+  margin-top: 10px;
+}
+
+.edit-actions button {
+  margin-right: 10px;
+}
