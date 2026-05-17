@@ -3,6 +3,8 @@ import { useState } from "react";
 import PollList from "./PollList";
 import Login from "./Login";
 import Register from "./Register";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(
@@ -51,6 +53,7 @@ function App() {
           </button>
         </>
       )}
+      <ToastContainer />
     </div>
   );
 }

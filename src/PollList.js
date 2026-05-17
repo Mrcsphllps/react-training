@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { toast } from "react-toastify";
 
 function PollList() {
   
@@ -106,6 +107,8 @@ const updatePoll = async (pollId) => {
         options: editOptions
       }),
     });
+
+toast.success("Poll updated successfully!");
 
     fetchPolls();
 
