@@ -3,14 +3,16 @@ import { toast } from "react-toastify";
 
 function PollList() {
   
-  const [question, setQuestion] = useState("");
-  const [option1, setOption1] = useState("");
+const [question, setQuestion] = useState("");
+const [option1, setOption1] = useState("");
 const [option2, setOption2] = useState("");
 const [option3, setOption3] = useState("");
-  const [polls, setPolls] = useState([]);
+const [polls, setPolls] = useState([]);
 const [editingPollId, setEditingPollId] = useState(null);
 const [editQuestion, setEditQuestion] = useState("");
 const [editOptions, setEditOptions] = useState([]);
+const [isSaving, setIsSaving] = useState(false);
+const [isCreating, setIsCreating] = useState(false);
 
   const fetchPolls = () => {
   fetch("http://localhost:5000/api/polls", {
@@ -37,9 +39,12 @@ useEffect(() => {
 
   function createPoll() {
     if (!question || !option1 || !option2 || !option3) {
-  alert("Please fill in the question and all three options.");
+  toast.error("Please fill in the question and all three options.");
   return;
 }
+
+  setIsCreating(true);
+
   fetch("http://localhost:5000/api/polls", {
   method: "POST",
   headers: {
@@ -57,13 +62,18 @@ useEffect(() => {
   })
     .then((response) => response.json())
     .then((newPoll) => {
+      setIsCreating(false);
+      toast.success("Poll created successfully!");
       setPolls([...polls, newPoll]);
       setQuestion("");
       setOption1("");
 setOption2("");
 setOption3("");
     })
-    .catch((error) => console.error("Error creating poll:", error));
+    .catch((error) => {
+  setIsCreating(false);
+  console.error("Error creating poll:", error);
+});
 }
 
 function deletePoll(pollId) {
@@ -83,6 +93,7 @@ function deletePoll(pollId) {
 })
     .then(() => {
       setPolls(polls.filter((poll) => poll.id !== pollId));
+      toast.success("Poll deleted successfully!");
     })
     .catch((error) => console.error("Error deleting poll:", error));
 }
@@ -95,6 +106,7 @@ const cancelEdit = () => {
 
 const updatePoll = async (pollId) => {
   try {
+    setIsSaving(true);
 
     await fetch(`http://localhost:5000/api/polls/${pollId}`, {
       method: "PUT",
@@ -110,11 +122,14 @@ const updatePoll = async (pollId) => {
 
 toast.success("Poll updated successfully!");
 
+    setIsSaving(false);
+    
     fetchPolls();
 
     setEditingPollId(null);
 
   } catch (error) {
+    setIsSaving(false);
     console.error("Error updating poll:", error);
   }
 };
@@ -151,7 +166,9 @@ toast.success("Poll updated successfully!");
   onChange={(e) => setOption3(e.target.value)}
 />
 
-  <button onClick={createPoll}>Create Poll</button>
+  <button onClick={createPoll} disabled={isCreating}>
+  {isCreating ? "Creating..." : "Create Poll"}
+</button>
 </div>
 
       {polls.length === 0 ? (
@@ -215,11 +232,12 @@ toast.success("Poll updated successfully!");
   ))}
   <div className="edit-actions">
   <button
-    className="edit-button"
-    onClick={() => updatePoll(poll.id)}
-  >
-    Save
-  </button>
+  className="edit-button"
+  onClick={() => updatePoll(poll.id)}
+  disabled={isSaving}
+>
+  {isSaving ? "Saving..." : "Save"}
+</button>
 
   <button
     className="delete-button"
