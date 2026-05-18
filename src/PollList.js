@@ -13,6 +13,7 @@ const [editQuestion, setEditQuestion] = useState("");
 const [editOptions, setEditOptions] = useState([]);
 const [isSaving, setIsSaving] = useState(false);
 const [isCreating, setIsCreating] = useState(false);
+const [votingPollId, setVotingPollId] = useState(null);
 
   const fetchPolls = () => {
   fetch("http://localhost:5000/api/polls", {
@@ -30,12 +31,19 @@ useEffect(() => {
 }, []);
 
   function vote(pollId, choiceId) {
+    setVotingPollId(pollId);
+
     fetch(`http://localhost:5000/api/polls/${pollId}/vote/${choiceId}`, {
       method: "POST",
     })
       .then(() => fetchPolls())
-      .catch((error) => console.error("Error voting:", error));
-  }
+      .then(() => setVotingPollId(null))
+      .catch((error) => {
+  setVotingPollId(null);
+  console.error("Error voting:", error);
+  toast.error("Failed to submit vote.");
+  });
+}
 
   function createPoll() {
     if (!question || !option1 || !option2 || !option3) {
@@ -250,10 +258,11 @@ toast.success("Poll updated successfully!");
 ) : poll.options && poll.options.length > 0 ? (
   poll.options.map((option) => (
     <button
-      className="choice-button"
-      key={option.id}
-      onClick={() => vote(poll.id, option.id)}
-    >
+  className="choice-button"
+  key={option.id}
+  onClick={() => vote(poll.id, option.id)}
+  disabled={votingPollId === poll.id}
+>
       {option.text} - Votes: {option.voteCount}
     </button>
   ))
