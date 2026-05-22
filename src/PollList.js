@@ -39,10 +39,9 @@ useEffect(() => {
       .then(() => fetchPolls())
       .then(() => setVotingPollId(null))
       .catch((error) => {
-  setVotingPollId(null);
-  console.error("Error voting:", error);
-  toast.error("Failed to submit vote.");
-  });
+  console.error("Error deleting poll:", error);
+  toast.error("Failed to delete poll.");
+});
 }
 
   function createPoll() {
@@ -99,10 +98,14 @@ function deletePoll(pollId) {
     Authorization: `Bearer ${localStorage.getItem("token")}`,
   },
 })
-    .then(() => {
-      setPolls(polls.filter((poll) => poll.id !== pollId));
-      toast.success("Poll deleted successfully!");
-    })
+    .then((response) => {
+  if (!response.ok) {
+    throw new Error("Delete failed");
+  }
+
+  setPolls(polls.filter((poll) => poll.id !== pollId));
+  toast.success("Poll deleted successfully!");
+})
     .catch((error) => console.error("Error deleting poll:", error));
 }
 
