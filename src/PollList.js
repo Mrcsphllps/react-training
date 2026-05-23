@@ -13,7 +13,7 @@ const [editQuestion, setEditQuestion] = useState("");
 const [editOptions, setEditOptions] = useState([]);
 const [isSaving, setIsSaving] = useState(false);
 const [isCreating, setIsCreating] = useState(false);
-const [votingPollId, setVotingPollId] = useState(null);
+const currentUser = JSON.parse(localStorage.getItem("user"));
 
   const fetchPolls = () => {
   fetch("http://localhost:5000/api/polls", {
@@ -31,18 +31,12 @@ useEffect(() => {
 }, []);
 
   function vote(pollId, choiceId) {
-    setVotingPollId(pollId);
-
     fetch(`http://localhost:5000/api/polls/${pollId}/vote/${choiceId}`, {
       method: "POST",
     })
       .then(() => fetchPolls())
-      .then(() => setVotingPollId(null))
-      .catch((error) => {
-  console.error("Error deleting poll:", error);
-  toast.error("Failed to delete poll.");
-});
-}
+      .catch((error) => console.error("Error voting:", error));
+  }
 
   function createPoll() {
     if (!question || !option1 || !option2 || !option3) {
@@ -80,6 +74,7 @@ setOption3("");
     .catch((error) => {
   setIsCreating(false);
   console.error("Error creating poll:", error);
+  toast.error("Failed to create poll.");
 });
 }
 
@@ -98,14 +93,10 @@ function deletePoll(pollId) {
     Authorization: `Bearer ${localStorage.getItem("token")}`,
   },
 })
-    .then((response) => {
-  if (!response.ok) {
-    throw new Error("Delete failed");
-  }
-
-  setPolls(polls.filter((poll) => poll.id !== pollId));
-  toast.success("Poll deleted successfully!");
-})
+    .then(() => {
+      setPolls(polls.filter((poll) => poll.id !== pollId));
+      toast.success("Poll deleted successfully!");
+    })
     .catch((error) => console.error("Error deleting poll:", error));
 }
 
@@ -261,11 +252,10 @@ toast.success("Poll updated successfully!");
 ) : poll.options && poll.options.length > 0 ? (
   poll.options.map((option) => (
     <button
-  className="choice-button"
-  key={option.id}
-  onClick={() => vote(poll.id, option.id)}
-  disabled={votingPollId === poll.id}
->
+      className="choice-button"
+      key={option.id}
+      onClick={() => vote(poll.id, option.id)}
+    >
       {option.text} - Votes: {option.voteCount}
     </button>
   ))
