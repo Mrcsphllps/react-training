@@ -23,8 +23,17 @@ function Login({ setIsLoggedIn }) {
 
   console.log("Login response:", data);
 
-  localStorage.setItem("token", data.accessToken);
-  setIsLoggedIn(true);
+localStorage.setItem("token", data.accessToken);
+const userResponse = await fetch("http://localhost:5000/api/users/me", {
+  headers: {
+    Authorization: `Bearer ${data.accessToken}`,
+  },
+});
+
+const userData = await userResponse.json();
+
+localStorage.setItem("user", JSON.stringify(userData));
+setIsLoggedIn(true);
 
   alert("Login successful!");
 } catch (error) {

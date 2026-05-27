@@ -204,10 +204,20 @@ toast.success("Poll updated successfully!");
 
             </>
           ) : (
-            <h3>{poll.question}</h3>
+            <>
+  <h3>{poll.question}</h3>
+
+  <p className="created-by">
+    Created by {poll.user ? poll.user.username : "Unknown"}
+  </p>
+</>
           )}
 
-          {editingPollId !== poll.id && (
+          {editingPollId !== poll.id &&
+  currentUser &&
+  poll.user &&
+  poll.user.id === currentUser.id && (
+    <>
   <button
     className="edit-button"
     onClick={() => {
@@ -218,15 +228,32 @@ toast.success("Poll updated successfully!");
   >
     Edit Poll
   </button>
+  </>
 )}
 
-{editingPollId !== poll.id && (
-<button
-  className="delete-button"
-  onClick={() => deletePoll(poll.id)}
->
-  Delete Poll
-</button>
+{editingPollId !== poll.id &&
+  currentUser &&
+  poll.user &&
+  poll.user.id === currentUser.id && (
+    <>
+      <button
+        className="edit-button"
+        onClick={() => {
+          setEditingPollId(poll.id);
+          setEditQuestion(poll.question);
+          setEditOptions(poll.options.map((option) => ({ ...option })));
+        }}
+      >
+        Edit Poll
+      </button>
+
+      <button
+        className="delete-button"
+        onClick={() => deletePoll(poll.id)}
+      >
+        Delete Poll
+      </button>
+    </>
 )}
 
   {editingPollId === poll.id ? (
