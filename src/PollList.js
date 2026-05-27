@@ -93,13 +93,19 @@ function deletePoll(pollId) {
     Authorization: `Bearer ${localStorage.getItem("token")}`,
   },
 })
-    .then(() => {
-      setPolls(polls.filter((poll) => poll.id !== pollId));
-      toast.success("Poll deleted successfully!");
-    })
-    .catch((error) => console.error("Error deleting poll:", error));
-}
+   .then((response) => {
+  if (!response.ok) {
+    throw new Error("Delete failed");
+  }
 
+  setPolls(polls.filter((poll) => poll.id !== pollId));
+  toast.success("Poll deleted successfully!");
+})
+.catch((error) => {
+  console.error("Error deleting poll:", error);
+  toast.error("You can only delete polls you created.");
+});
+}
 const cancelEdit = () => {
   setEditingPollId(null);
   setEditQuestion("");
@@ -110,7 +116,7 @@ const updatePoll = async (pollId) => {
   try {
     setIsSaving(true);
 
-    await fetch(`http://localhost:5000/api/polls/${pollId}`, {
+    const response = await fetch(`http://localhost:5000/api/polls/${pollId}`, {
       method: "PUT",
       headers: {
   "Content-Type": "application/json",
@@ -122,6 +128,10 @@ const updatePoll = async (pollId) => {
       }),
     });
 
+    if (!response.ok) {
+  throw new Error("Update failed");
+}
+
 toast.success("Poll updated successfully!");
 
     setIsSaving(false);
@@ -131,9 +141,11 @@ toast.success("Poll updated successfully!");
     setEditingPollId(null);
 
   } catch (error) {
-    setIsSaving(false);
-    console.error("Error updating poll:", error);
-  }
+  setIsSaving(false);
+  console.error("Error updating poll:", error);
+  toast.error("You can only edit polls you created.");
+}
+
 };
   return (
     <div>
