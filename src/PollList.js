@@ -31,18 +31,34 @@ useEffect(() => {
 }, []);
 
   function vote(pollId, choiceId) {
-    fetch(`http://localhost:5000/api/polls/${pollId}/vote/${choiceId}`, {
-      method: "POST",
-    })
-      .then(() => fetchPolls())
-      .catch((error) => console.error("Error voting:", error));
-  }
+  fetch(`http://localhost:5000/api/polls/${pollId}/vote/${choiceId}`, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${localStorage.getItem("token")}`,
+    },
+  })
+    .then((response) => {
+      if (!response.ok) {
 
-  function createPoll() {
-    if (!question || !option1 || !option2 || !option3) {
-  toast.error("Please fill in the question and all three options.");
+  response.text().then((message) => {
+
+    if (message.includes("own poll")) {
+      toast.error("You cannot vote on your own poll.");
+    } else {
+      toast.error("Vote not allowed. You may have already voted or you own this poll.");
+    }
+
+  });
+
   return;
 }
+
+      fetchPolls();
+    })
+    .catch((error) => console.error("Error voting:", error));
+}
+
+function createPoll() {
 
   setIsCreating(true);
 
@@ -218,17 +234,7 @@ toast.success("Poll updated successfully!");
   poll.user &&
   poll.user.id === currentUser.id && (
     <>
-  <button
-    className="edit-button"
-    onClick={() => {
-      setEditingPollId(poll.id);
-      setEditQuestion(poll.question);
-      setEditOptions(poll.options.map((option) => ({ ...option })));
-    }}
-  >
-    Edit Poll
-  </button>
-  </>
+    </>
 )}
 
 {editingPollId !== poll.id &&
