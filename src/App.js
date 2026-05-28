@@ -7,16 +7,14 @@ import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
 function App() {
-  const [isLoggedIn, setIsLoggedIn] = useState(
-    !!localStorage.getItem("token")
-  );
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
   
   const [showRegister, setShowRegister] = useState(false);
-
   const handleLogout = () => {
-    localStorage.removeItem("token");
-    setIsLoggedIn(false);
-  };
+  localStorage.removeItem("token");
+  localStorage.removeItem("user");
+  setIsLoggedIn(false);
+};
 
   return (
     <div className="app">
