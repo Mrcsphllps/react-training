@@ -8,14 +8,15 @@ const [option1, setOption1] = useState("");
 const [option2, setOption2] = useState("");
 const [option3, setOption3] = useState("");
 const [polls, setPolls] = useState([]);
-const [myVotes, setMyVotes] = useState({});
 const [editingPollId, setEditingPollId] = useState(null);
 const [editQuestion, setEditQuestion] = useState("");
 const [editOptions, setEditOptions] = useState([]);
 const [isSaving, setIsSaving] = useState(false);
 const [isCreating, setIsCreating] = useState(false);
 const currentUser = JSON.parse(localStorage.getItem("user"));
+const [myVotes, setMyVotes] = useState({});
 const [profileStats, setProfileStats] = useState(null);
+const [myPolls, setMyPolls] = useState([]);
 
   const fetchPolls = () => {
   fetch("http://localhost:5000/api/polls", {
@@ -32,6 +33,7 @@ useEffect(() => {
   fetchPolls();
   fetchMyVotes();
   fetchProfileStats();
+  fetchMyPolls();
 }, []);
 
 function fetchMyVotes() {
@@ -46,7 +48,10 @@ function fetchMyVotes() {
 }
 
 function getTotalVotes(poll) {
-  return poll.options.reduce((sum, option) => sum + option.voteCount, 0);
+  return poll.options.reduce(
+    (sum, option) => sum + option.voteCount,
+    0
+  );
 }
 
 function getVotePercentage(poll, option) {
@@ -56,7 +61,31 @@ function getVotePercentage(poll, option) {
     return 0;
   }
 
-  return Math.round((option.voteCount / totalVotes) * 100);
+  return Math.round(
+    (option.voteCount / totalVotes) * 100
+  );
+}
+
+function fetchProfileStats() {
+  fetch("http://localhost:5000/api/users/me/stats", {
+    headers: {
+      Authorization: `Bearer ${localStorage.getItem("token")}`,
+    },
+  })
+    .then((response) => response.json())
+    .then((data) => setProfileStats(data))
+    .catch((error) => console.error("Error fetching profile stats:", error));
+}
+
+function fetchMyPolls() {
+  fetch("http://localhost:5000/api/users/me/polls", {
+    headers: {
+      Authorization: `Bearer ${localStorage.getItem("token")}`,
+    },
+  })
+    .then((response) => response.json())
+    .then((data) => setMyPolls(data))
+    .catch((error) => console.error("Error fetching my polls:", error));
 }
 
   function vote(pollId, choiceId) {
@@ -85,17 +114,6 @@ function getVotePercentage(poll, option) {
       fetchPolls();
     })
     .catch((error) => console.error("Error voting:", error));
-}
-
-function fetchProfileStats() {
-  fetch("http://localhost:5000/api/users/me/stats", {
-    headers: {
-      Authorization: `Bearer ${localStorage.getItem("token")}`,
-    },
-  })
-    .then((response) => response.json())
-    .then((data) => setProfileStats(data))
-    .catch((error) => console.error("Error fetching profile stats:", error));
 }
 
 function createPoll() {
@@ -206,7 +224,7 @@ toast.success("Poll updated successfully!");
   return (
     <div>
       <h2>Gaming Polls</h2>
-
+      
       {profileStats && (
   <div className="profile-summary">
     <div className="profile-avatar">
@@ -216,18 +234,31 @@ toast.success("Poll updated successfully!");
     <div>
       <h3>{profileStats.username}</h3>
       <p>{profileStats.email}</p>
-      <div className="profile-stats">
-  <div>
-    <strong>{profileStats.pollCount}</strong>
-    <span> Polls</span>
-  </div>
 
-  <div>
-    <strong>{profileStats.voteCount}</strong>
-    <span> Votes</span>
-  </div>
-</div>
+      <div className="profile-stats">
+        <div>
+          <strong>{profileStats.pollCount}</strong>
+          <span> Polls</span>
+        </div>
+
+        <div>
+          <strong>{profileStats.voteCount}</strong>
+          <span> Votes</span>
+        </div>
+      </div>
     </div>
+  </div>
+)}
+
+{myPolls.length > 0 && (
+  <div className="my-polls-section">
+    <h3>My Polls</h3>
+
+    <ul>
+      {myPolls.map((poll) => (
+        <li key={poll.id}>{poll.question}</li>
+      ))}
+    </ul>
   </div>
 )}
 
@@ -366,17 +397,17 @@ toast.success("Poll updated successfully!");
       onClick={() => vote(poll.id, option.id)}
     >
       {option.text} - Votes: {option.voteCount} ({getVotePercentage(poll, option)}%)
-      {myVotes[poll.id] === option.id ? " ✓ You voted" : ""}
+      {Number(myVotes[poll.id]) === Number(option.id) ? " ✓ You voted" : ""}
     </button>
   ))
 ) : (
         <p>No options available yet.</p>
     )}
-        </div>
-     ))
-      )}
-    </div>
-  );
+  </div>
+))
+)}
+</div>
+);
 }
 
 export default PollList;
