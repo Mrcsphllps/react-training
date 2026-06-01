@@ -8,6 +8,7 @@ const [option1, setOption1] = useState("");
 const [option2, setOption2] = useState("");
 const [option3, setOption3] = useState("");
 const [polls, setPolls] = useState([]);
+const [myVotes, setMyVotes] = useState({});
 const [editingPollId, setEditingPollId] = useState(null);
 const [editQuestion, setEditQuestion] = useState("");
 const [editOptions, setEditOptions] = useState([]);
@@ -28,7 +29,19 @@ const currentUser = JSON.parse(localStorage.getItem("user"));
 
 useEffect(() => {
   fetchPolls();
+  fetchMyVotes();
 }, []);
+
+function fetchMyVotes() {
+  fetch("http://localhost:5000/api/polls/my-votes", {
+    headers: {
+      Authorization: `Bearer ${localStorage.getItem("token")}`,
+    },
+  })
+    .then((response) => response.json())
+    .then((data) => setMyVotes(data))
+    .catch((error) => console.error("Error fetching my votes:", error));
+}
 
   function vote(pollId, choiceId) {
   fetch(`http://localhost:5000/api/polls/${pollId}/vote/${choiceId}`, {
@@ -302,6 +315,7 @@ toast.success("Poll updated successfully!");
       onClick={() => vote(poll.id, option.id)}
     >
       {option.text} - Votes: {option.voteCount}
+      {myVotes[poll.id] === option.id ? " ✓ You voted" : ""}
     </button>
   ))
 ) : (
