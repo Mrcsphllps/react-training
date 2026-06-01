@@ -315,17 +315,38 @@ toast.success("Poll updated successfully!");
       onClick={() => vote(poll.id, option.id)}
     >
       {option.text} - Votes: {option.voteCount}
-      {myVotes[poll.id] === option.id ? " ✓ You voted" : ""}
+
+{" ("}
+
+{poll.options.reduce(
+  (sum, opt) => sum + opt.voteCount,
+  0
+) > 0
+  ? Math.round(
+      (option.voteCount /
+        poll.options.reduce(
+          (sum, opt) => sum + opt.voteCount,
+          0
+        )) *
+        100
+    )
+  : 0}
+
+{"%)"}
+
+{Number(myVotes[poll.id]) === Number(option.id)
+  ? " ✓ You voted"
+  : ""}
     </button>
   ))
 ) : (
         <p>No options available yet.</p>
     )}
-  </div>
-))
-)}
-</div>
-);
+        </div>
+     ))
+      )}
+    </div>
+  );
 }
 
 export default PollList;
