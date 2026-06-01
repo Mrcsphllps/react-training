@@ -15,6 +15,7 @@ const [editOptions, setEditOptions] = useState([]);
 const [isSaving, setIsSaving] = useState(false);
 const [isCreating, setIsCreating] = useState(false);
 const currentUser = JSON.parse(localStorage.getItem("user"));
+const [profileStats, setProfileStats] = useState(null);
 
   const fetchPolls = () => {
   fetch("http://localhost:5000/api/polls", {
@@ -30,6 +31,7 @@ const currentUser = JSON.parse(localStorage.getItem("user"));
 useEffect(() => {
   fetchPolls();
   fetchMyVotes();
+  fetchProfileStats();
 }, []);
 
 function fetchMyVotes() {
@@ -83,6 +85,17 @@ function getVotePercentage(poll, option) {
       fetchPolls();
     })
     .catch((error) => console.error("Error voting:", error));
+}
+
+function fetchProfileStats() {
+  fetch("http://localhost:5000/api/users/me/stats", {
+    headers: {
+      Authorization: `Bearer ${localStorage.getItem("token")}`,
+    },
+  })
+    .then((response) => response.json())
+    .then((data) => setProfileStats(data))
+    .catch((error) => console.error("Error fetching profile stats:", error));
 }
 
 function createPoll() {
@@ -193,6 +206,30 @@ toast.success("Poll updated successfully!");
   return (
     <div>
       <h2>Gaming Polls</h2>
+
+      {profileStats && (
+  <div className="profile-summary">
+    <div className="profile-avatar">
+      {profileStats.username.charAt(0).toUpperCase()}
+    </div>
+
+    <div>
+      <h3>{profileStats.username}</h3>
+      <p>{profileStats.email}</p>
+      <div className="profile-stats">
+  <div>
+    <strong>{profileStats.pollCount}</strong>
+    <span> Polls</span>
+  </div>
+
+  <div>
+    <strong>{profileStats.voteCount}</strong>
+    <span> Votes</span>
+  </div>
+</div>
+    </div>
+  </div>
+)}
 
       <div className="poll-form">
       <input
