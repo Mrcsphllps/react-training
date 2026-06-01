@@ -43,6 +43,20 @@ function fetchMyVotes() {
     .catch((error) => console.error("Error fetching my votes:", error));
 }
 
+function getTotalVotes(poll) {
+  return poll.options.reduce((sum, option) => sum + option.voteCount, 0);
+}
+
+function getVotePercentage(poll, option) {
+  const totalVotes = getTotalVotes(poll);
+
+  if (totalVotes === 0) {
+    return 0;
+  }
+
+  return Math.round((option.voteCount / totalVotes) * 100);
+}
+
   function vote(pollId, choiceId) {
   fetch(`http://localhost:5000/api/polls/${pollId}/vote/${choiceId}`, {
     method: "POST",
@@ -314,29 +328,8 @@ toast.success("Poll updated successfully!");
       key={option.id}
       onClick={() => vote(poll.id, option.id)}
     >
-      {option.text} - Votes: {option.voteCount}
-
-{" ("}
-
-{poll.options.reduce(
-  (sum, opt) => sum + opt.voteCount,
-  0
-) > 0
-  ? Math.round(
-      (option.voteCount /
-        poll.options.reduce(
-          (sum, opt) => sum + opt.voteCount,
-          0
-        )) *
-        100
-    )
-  : 0}
-
-{"%)"}
-
-{Number(myVotes[poll.id]) === Number(option.id)
-  ? " ✓ You voted"
-  : ""}
+      {option.text} - Votes: {option.voteCount} ({getVotePercentage(poll, option)}%)
+      {myVotes[poll.id] === option.id ? " ✓ You voted" : ""}
     </button>
   ))
 ) : (
