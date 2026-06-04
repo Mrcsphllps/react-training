@@ -17,6 +17,8 @@ const currentUser = JSON.parse(localStorage.getItem("user"));
 const [myVotes, setMyVotes] = useState({});
 const [profileStats, setProfileStats] = useState(null);
 const [myPolls, setMyPolls] = useState([]);
+const [category, setCategory] = useState("Gaming");
+const [selectedCategory, setSelectedCategory] = useState("All");
 
   const fetchPolls = () => {
   fetch("http://localhost:5000/api/polls", {
@@ -127,8 +129,9 @@ function createPoll() {
     Authorization: `Bearer ${localStorage.getItem("token")}`,
   },
     body: JSON.stringify({
-      question: question,
-      options: [
+  question: question,
+  category: category,
+  options: [
   { text: option1 },
   { text: option2 },
   { text: option3 },
@@ -250,19 +253,49 @@ toast.success("Poll updated successfully!");
   </div>
 )}
 
-{myPolls.length > 0 && (
-  <div className="my-polls-section">
-    <h3>My Polls</h3>
+<div className="my-polls-section">
+  <h3>My Polls</h3>
 
+  {myPolls.length > 0 ? (
     <ul>
       {myPolls.map((poll) => (
         <li key={poll.id}>{poll.question}</li>
       ))}
     </ul>
-  </div>
-)}
+  ) : (
+    <p>You have not created any polls yet.</p>
+  )}
+</div>
+
+<div className="category-filter">
+  <label>View Category: </label>
+
+  <select
+    value={selectedCategory}
+    onChange={(e) => setSelectedCategory(e.target.value)}
+  >
+    <option value="All">All Categories</option>
+    <option value="Gaming">Gaming</option>
+    <option value="Technology">Technology</option>
+    <option value="Sports">Sports</option>
+    <option value="Movies">Movies</option>
+    <option value="Music">Music</option>
+  </select>
+</div>
 
       <div className="poll-form">
+
+<select
+  value={category}
+  onChange={(e) => setCategory(e.target.value)}
+>
+  <option value="Gaming">Gaming</option>
+  <option value="Technology">Technology</option>
+  <option value="Sports">Sports</option>
+  <option value="Movies">Movies</option>
+  <option value="Music">Music</option>
+</select>
+
       <input
   type="text"
   placeholder="Enter poll question"
@@ -298,11 +331,17 @@ toast.success("Poll updated successfully!");
 
       {polls.length === 0 ? (
   <p className="empty-message">
-  No polls available yet. Create your first poll above.
-</p>
+    No polls available yet. Create your first poll above.
+  </p>
 ) : (
-  polls.map((poll) => (
-        <div className="poll-card" key={poll.id}>
+  polls
+    .filter(
+      (poll) =>
+        selectedCategory === "All" ||
+        poll.category === selectedCategory
+    )
+    .map((poll) => (
+      <div className="poll-card" key={poll.id}>
           {editingPollId === poll.id ? (
             <>
             <h3>Editing Poll</h3>
@@ -317,6 +356,10 @@ toast.success("Poll updated successfully!");
           ) : (
             <>
   <h3>{poll.question}</h3>
+
+  <p className="created-by">
+  Category: {poll.category || "Uncategorized"}
+</p>
 
   <p className="created-by">
     Created by {poll.user ? poll.user.username : "Unknown"}
