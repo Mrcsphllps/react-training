@@ -75,7 +75,7 @@ button {
 }
 .poll-form {
   display: grid;
-  grid-template-columns: 1fr 1fr 1fr 1fr auto;
+  grid-template-columns: 1fr 1fr 1fr 1fr 1fr auto;
   gap: 14px;
   align-items: center;
   margin-bottom: 35px;
@@ -88,6 +88,8 @@ button {
 
 .poll-form button {
   height: 58px;
+  min-width: 160px;
+  white-space: nowrap;
   margin: 0;
   transition: all 0.25s ease;
 }
@@ -275,4 +277,50 @@ button {
   margin-bottom: 8px;
   color: #e5e7eb;
   font-weight: bold;
+}
+
+.category-page {
+  text-align: center;
+  padding: 40px 20px;
+}
+
+.category-page h2 {
+  color: white;
+  margin-bottom: 30px;
+  font-size: 32px;
+}
+
+.category-grid {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+.category-button {
+  background: #38bdf8;
+  color: white;
+  border: none;
+  border-radius: 12px;
+  padding: 20px 40px;
+  font-size: 18px;
+  font-weight: bold;
+  cursor: pointer;
+  min-width: 180px;
+  transition: transform 0.2s ease;
+}
+
+.category-button:hover {
+  transform: translateY(-3px);
+}
+
+.logout-button {
+  margin-top: 40px;
+  background: #ff4d4d;
+  color: white;
+  border: none;
+  padding: 12px 22px;
+  border-radius: 8px;
+  font-weight: bold;
+  cursor: pointer;
 }

@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 
-function PollList() {
+function PollList({ handleLogout }) {
   
 const [question, setQuestion] = useState("");
 const [option1, setOption1] = useState("");
@@ -18,7 +18,11 @@ const [myVotes, setMyVotes] = useState({});
 const [profileStats, setProfileStats] = useState(null);
 const [myPolls, setMyPolls] = useState([]);
 const [category, setCategory] = useState("Gaming");
-const [selectedCategory, setSelectedCategory] = useState("All");
+const [activeCategory, setActiveCategory] = useState(null);
+const [selectedCategory, setSelectedCategory] = useState(activeCategory || "All");
+
+
+const categories = ["Gaming", "Technology", "Sports", "Movies", "Music"];
 
   const fetchPolls = () => {
   fetch("http://localhost:5000/api/polls", {
@@ -224,7 +228,32 @@ toast.success("Poll updated successfully!");
 }
 
 };
+
+
+  if (!activeCategory) {
   return (
+    <div className="category-page">
+      <h2>Choose a Category</h2>
+
+      <div className="category-grid">
+        {categories.map((cat) => (
+          <button
+            key={cat}
+            className="category-button"
+            onClick={() => {
+            setActiveCategory(cat);
+            setSelectedCategory(cat);
+}}
+          >
+            {cat}
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+return (
     <div>
       <h2>Gaming Polls</h2>
       
@@ -449,6 +478,14 @@ toast.success("Poll updated successfully!");
   </div>
 ))
 )}
+
+<button
+  className="logout-button"
+  onClick={handleLogout}
+>
+  Logout
+</button>
+
 </div>
 );
 }

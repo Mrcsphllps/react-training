@@ -20,15 +20,12 @@ function App() {
 
   return (
     <div className="app">
-      <h1>Polls Frontend</h1>
+      <h1>Polling App</h1>
 
       {isLoggedIn ? (
         <>
-          <button className="delete-button" onClick={handleLogout}>
-            Logout
-          </button>
 
-          <PollList />
+          <PollList handleLogout={handleLogout} />
         </>
       ) : showRegister ? (
         <>
