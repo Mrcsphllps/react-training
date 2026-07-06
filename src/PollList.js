@@ -17,7 +17,6 @@ const currentUser = JSON.parse(localStorage.getItem("user"));
 const [myVotes, setMyVotes] = useState({});
 const [profileStats, setProfileStats] = useState(null);
 const [myPolls, setMyPolls] = useState([]);
-const [category, setCategory] = useState("Gaming");
 const [activeCategory, setActiveCategory] = useState(null);
 const [selectedCategory, setSelectedCategory] = useState(activeCategory || "All");
 
@@ -132,9 +131,9 @@ function createPoll() {
     "Content-Type": "application/json",
     Authorization: `Bearer ${localStorage.getItem("token")}`,
   },
-    body: JSON.stringify({
+  body: JSON.stringify({
   question: question,
-  category: category,
+  category: activeCategory,
   options: [
   { text: option1 },
   { text: option2 },
@@ -255,7 +254,16 @@ toast.success("Poll updated successfully!");
 
 return (
     <div>
-      <h2>Gaming Polls</h2>
+      <div className="page-header">
+  <button
+    className="back-button"
+    onClick={() => setActiveCategory(null)}
+  >
+    ← Back to Categories
+  </button>
+
+  <h2>{activeCategory} Polls</h2>
+</div>
       
       {profileStats && (
   <div className="profile-summary">
@@ -288,7 +296,14 @@ return (
   {myPolls.length > 0 ? (
     <ul>
       {myPolls.map((poll) => (
-        <li key={poll.id}>{poll.question}</li>
+        <li key={poll.id}>
+  {poll.category === "Gaming" && "🎮 "}
+  {poll.category === "Technology" && "💻 "}
+  {poll.category === "Sports" && "⚽ "}
+  {poll.category === "Movies" && "🎬 "}
+  {poll.category === "Music" && "🎵 "}
+  {poll.question}
+</li>
       ))}
     </ul>
   ) : (
@@ -296,34 +311,7 @@ return (
   )}
 </div>
 
-<div className="category-filter">
-  <label>View Category: </label>
-
-  <select
-    value={selectedCategory}
-    onChange={(e) => setSelectedCategory(e.target.value)}
-  >
-    <option value="All">All Categories</option>
-    <option value="Gaming">Gaming</option>
-    <option value="Technology">Technology</option>
-    <option value="Sports">Sports</option>
-    <option value="Movies">Movies</option>
-    <option value="Music">Music</option>
-  </select>
-</div>
-
       <div className="poll-form">
-
-<select
-  value={category}
-  onChange={(e) => setCategory(e.target.value)}
->
-  <option value="Gaming">Gaming</option>
-  <option value="Technology">Technology</option>
-  <option value="Sports">Sports</option>
-  <option value="Movies">Movies</option>
-  <option value="Music">Music</option>
-</select>
 
       <input
   type="text"
